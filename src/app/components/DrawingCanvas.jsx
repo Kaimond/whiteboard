@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Toolbar from "./Toolbar"
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+    const [colour, setColour] = useState("#000000");
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -15,8 +17,14 @@ export default function DrawingCanvas() {
         canvas.height = 900;
         ctx.lineWidth = 5;
         ctx.lineCap = "round";
-        ctx.strokeStyle = "white";
+        ctx.strokeStyle = colour;
     }, []);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.strokeStyle = colour;
+    }, [colour])
 
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -44,8 +52,15 @@ export default function DrawingCanvas() {
         ctx.closePath();
     };
 
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
     return (
         <div>
+            <Toolbar clearCanvas={clearCanvas} setColour={setColour} />
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
