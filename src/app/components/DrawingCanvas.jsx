@@ -6,7 +6,7 @@ export default function DrawingCanvas() {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
-    const [colour, setColour] = useState("#000000");
+    const [colour, setColour] = useState("#ffffff");
 
     useEffect(() => {
         const canvas = canvasRef.current;

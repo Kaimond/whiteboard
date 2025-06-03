@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export default function Toolbar({ clearCanvas, setColour }) {
-    const [selectedColour, setSelectedColour] = useState("#000000");
+    const [selectedColour, setSelectedColour] = useState("#ffffff");
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
