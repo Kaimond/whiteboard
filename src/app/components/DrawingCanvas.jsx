@@ -6,7 +6,8 @@ export default function DrawingCanvas() {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
-    const [colour, setColour] = useState("#ffffff");
+    const [lineColour, setLineColour] = useState("#ffffff");
+    const [lineWidth, setLineWidth] = useState("5");
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -15,16 +16,22 @@ export default function DrawingCanvas() {
         // Set canvas size
         canvas.width = 1300;
         canvas.height = 900;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = lineWidth;
         ctx.lineCap = "round";
-        ctx.strokeStyle = colour;
+        ctx.strokeStyle = lineColour;
     }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
-        ctx.strokeStyle = colour;
-    }, [colour])
+        ctx.strokeStyle = lineColour;
+    }, [lineColour])
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.lineWidth = lineWidth;
+    }, [lineWidth])
 
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -60,7 +67,7 @@ export default function DrawingCanvas() {
 
     return (
         <div>
-            <Toolbar clearCanvas={clearCanvas} setColour={setColour} />
+            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} />
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
