@@ -1,13 +1,20 @@
 "use client";
 import { useState } from "react";
 
-export default function Toolbar({ clearCanvas, setColour }) {
+export default function Toolbar({ clearCanvas, setColour, setWidth }) {
     const [selectedColour, setSelectedColour] = useState("#ffffff");
+    const [lineWidth, setLineWidth] = useState("5");
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
         setSelectedColour(newColour);
         setColour(newColour);
+    };
+
+    const handleWidthChange = (e) => {
+        const newWidth = e.target.value;
+        setLineWidth(newWidth);
+        setWidth(newWidth);
     };
 
     return (
@@ -27,6 +34,15 @@ export default function Toolbar({ clearCanvas, setColour }) {
                 value={selectedColour}
                 onChange={handleColourChange}
                 style={{ verticalAlign: "middle" }}
+            />
+            Line Width:
+            <input
+                type="number"
+                value={lineWidth}
+                onChange={handleWidthChange}
+                min={"1"}
+                max={"100"}
+                style={{ marginLeft: "4px", border: "2px solid white", verticalAlign: "middle" }}
             />
         </div>
     );
