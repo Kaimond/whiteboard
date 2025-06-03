@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-export default function Toolbar({ clearCanvas, setColour, setWidth }) {
+export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing }) {
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
 
@@ -44,6 +44,26 @@ export default function Toolbar({ clearCanvas, setColour, setWidth }) {
                 max={"100"}
                 style={{ marginLeft: "4px", border: "2px solid white", verticalAlign: "middle" }}
             />
+            <button
+                onClick={eraser}
+                style={{
+                    padding: "8px 16px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                Eraser
+            </button>
+            <button
+                onClick={drawing}
+                style={{
+                    padding: "8px 16px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                Draw
+            </button>
         </div>
     );
 }
