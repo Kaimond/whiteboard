@@ -65,9 +65,21 @@ export default function DrawingCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
+    const eraser = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.globalCompositeOperation = "destination-out"
+    };
+
+    const drawing = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.globalCompositeOperation = "source-over"
+    };
+
     return (
         <div>
-            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} />
+            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} eraser={eraser} drawing={drawing} />
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
