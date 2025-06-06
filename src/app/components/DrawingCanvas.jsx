@@ -8,6 +8,7 @@ export default function DrawingCanvas() {
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
     const [lineColour, setLineColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
+    const [backgroundColor, setBackgroundColor] = useState("black");
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -79,13 +80,13 @@ export default function DrawingCanvas() {
 
     return (
         <div>
-            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} eraser={eraser} drawing={drawing} />
+            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} eraser={eraser} drawing={drawing} setBackgroundColor={setBackgroundColor} />
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
                 onMouseUp={stopDrawing}
                 onMouseMove={draw}
-                style={{ border: "1px solid black" }}
+                style={{ border: "1px solid black", backgroundColor: backgroundColor }}
             />
         </div>
     );
