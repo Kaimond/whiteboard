@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
+import { FaPencilAlt } from "react-icons/fa";
+import { FaEraser } from "react-icons/fa";
 
-export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing }) {
+export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing, setBackgroundColor }) {
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
+    const [backgroundPickerColor, setBackgroundPickerColor] = useState("#000000");
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
@@ -15,6 +18,12 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
         const newWidth = e.target.value;
         setLineWidth(newWidth);
         setWidth(newWidth);
+    };
+
+    const handleBackgroundColorChange = (e) => {
+        const newColor = e.target.value;
+        setBackgroundPickerColor(newColor);
+        setBackgroundColor(newColor);
     };
 
     return (
@@ -45,16 +54,6 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
                 style={{ marginLeft: "4px", border: "2px solid white", verticalAlign: "middle" }}
             />
             <button
-                onClick={eraser}
-                style={{
-                    padding: "8px 16px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                }}
-            >
-                Eraser
-            </button>
-            <button
                 onClick={drawing}
                 style={{
                     padding: "8px 16px",
@@ -62,8 +61,25 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
                     cursor: "pointer",
                 }}
             >
-                Draw
+                <FaPencilAlt />
             </button>
+            <button
+                onClick={eraser}
+                style={{
+                    padding: "8px 16px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                <FaEraser />
+            </button>
+            <span>Background Color:</span>
+            <input
+                type="color"
+                value={backgroundPickerColor}
+                onChange={handleBackgroundColorChange}
+                style={{ verticalAlign: "middle" }}
+            />
         </div>
     );
 }
