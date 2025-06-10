@@ -3,10 +3,10 @@ import { useState } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaEraser } from "react-icons/fa";
 
-export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing, setBackgroundColor }) {
+export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing, setBackgroundColour }) {
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
-    const [backgroundPickerColor, setBackgroundPickerColor] = useState("#000000");
+    const [backgroundPickerColour, setBackgroundPickerColour] = useState("#000000");
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
@@ -20,10 +20,10 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
         setWidth(newWidth);
     };
 
-    const handleBackgroundColorChange = (e) => {
-        const newColor = e.target.value;
-        setBackgroundPickerColor(newColor);
-        setBackgroundColor(newColor);
+    const handleBackgroundColourChange = (e) => {
+        const newColour = e.target.value;
+        setBackgroundPickerColour(newColour);
+        setBackgroundColour(newColour);
     };
 
     return (
@@ -73,11 +73,11 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
             >
                 <FaEraser />
             </button>
-            <span>Background Color:</span>
+            <span>Background Colour:</span>
             <input
                 type="color"
-                value={backgroundPickerColor}
-                onChange={handleBackgroundColorChange}
+                value={backgroundPickerColour}
+                onChange={handleBackgroundColourChange}
                 style={{ verticalAlign: "middle" }}
             />
         </div>
