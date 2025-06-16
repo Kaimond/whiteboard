@@ -1,9 +1,19 @@
 "use client";
 import { useState } from "react";
+import { FaTrash } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaEraser } from "react-icons/fa";
 
-export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, drawing, setBackgroundColour }) {
+export default function Toolbar({
+    clearCanvas,
+    setColour,
+    setWidth,
+    eraser,
+    drawing,
+    setBackgroundColour,
+    opacity,
+    setOpacity,
+}) {
     const [activeTool, setActiveTool] = useState("draw");
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
@@ -27,6 +37,11 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
         setBackgroundColour(newColour);
     };
 
+    const handleOpacityChange = (e) => {
+        const newOpacity = e.target.value / 100;
+        setOpacity(newOpacity);
+    };
+
     return (
         <div style={{ marginBottom: "10px", backgroundColor: "#BEBEBE", color: "black", width: "700px", borderRadius: "10px" }}>
             <button
@@ -37,8 +52,9 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
                     cursor: "pointer",
                 }}
             >
-                Clear Canvas
+                <FaTrash />
             </button>
+            Line Colour:
             <input
                 type="color"
                 value={selectedColour}
@@ -83,6 +99,15 @@ export default function Toolbar({ clearCanvas, setColour, setWidth, eraser, draw
                 type="color"
                 value={backgroundPickerColour}
                 onChange={handleBackgroundColourChange}
+                style={{ verticalAlign: "middle" }}
+            />
+            <span style={{ marginRight: "10px" }}>Opacity: {(opacity * 100).toFixed(0)}%</span>
+            <input
+                type="range"
+                min="0"
+                max="100"
+                value={opacity * 100}
+                onChange={handleOpacityChange}
                 style={{ verticalAlign: "middle" }}
             />
         </div>

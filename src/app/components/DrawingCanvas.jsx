@@ -9,6 +9,7 @@ export default function DrawingCanvas() {
     const [lineColour, setLineColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundColour, setBackgroundColour] = useState("black");
+    const [opacity, setOpacity] = useState(1.0);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -20,6 +21,7 @@ export default function DrawingCanvas() {
         ctx.lineWidth = lineWidth;
         ctx.lineCap = "round";
         ctx.strokeStyle = lineColour;
+        ctx.globalAlpha = opacity;
     }, []);
 
     useEffect(() => {
@@ -33,6 +35,12 @@ export default function DrawingCanvas() {
         const ctx = canvas.getContext("2d");
         ctx.lineWidth = lineWidth;
     }, [lineWidth])
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.globalAlpha = opacity;
+    }, [opacity]);
 
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -80,7 +88,16 @@ export default function DrawingCanvas() {
 
     return (
         <div>
-            <Toolbar clearCanvas={clearCanvas} setColour={setLineColour} setWidth={setLineWidth} eraser={eraser} drawing={drawing} setBackgroundColour={setBackgroundColour} />
+            <Toolbar
+                clearCanvas={clearCanvas}
+                setColour={setLineColour}
+                setWidth={setLineWidth}
+                eraser={eraser}
+                drawing={drawing}
+                setBackgroundColour={setBackgroundColour}
+                opacity={opacity}
+                setOpacity={setOpacity}
+            />
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
