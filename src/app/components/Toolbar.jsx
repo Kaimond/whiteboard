@@ -15,6 +15,7 @@ export default function Toolbar({
     setOpacity,
 }) {
     const [activeTool, setActiveTool] = useState("draw");
+    const [hover, setHover] = useState(false);
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#000000");
@@ -43,7 +44,7 @@ export default function Toolbar({
     };
 
     return (
-        <div style={{ marginBottom: "10px", backgroundColor: "#BEBEBE", color: "black", width: "700px", borderRadius: "10px" }}>
+        <div style={{ marginBottom: "10px", backgroundColor: "#FFFFFF", color: "black", width: "700px", borderRadius: "10px" }}>
             <button
                 onClick={clearCanvas}
                 style={{
@@ -76,9 +77,13 @@ export default function Toolbar({
                     padding: "8px",
                     marginRight: "10px",
                     cursor: "pointer",
-                    border: activeTool === "draw" ? "2px solid #6C3BAA" : "",
-                    borderRadius: activeTool === "draw" ? "12px" : "",
+                    fontSize: "20px",
+                    color: activeTool === "draw" ? "#526EFF" : "",
+                    backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
+                    borderRadius: activeTool === "draw" ? "4px" : "",
                 }}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
             >
                 <FaPencilAlt />
             </button>
@@ -88,8 +93,10 @@ export default function Toolbar({
                     padding: "8px",
                     marginRight: "10px",
                     cursor: "pointer",
-                    border: activeTool === "erase" ? "2px solid #6C3BAA" : "",
-                    borderRadius: activeTool === "erase" ? "12px" : "",
+                    fontSize: "20px",
+                    color: activeTool === "erase" ? "#526EFF" : "",
+                    backgroundColor: activeTool === "erase" ? "#e7ebfb" : "",
+                    borderRadius: activeTool === "erase" ? "4px" : "",
                 }}
             >
                 <FaEraser />
