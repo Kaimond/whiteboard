@@ -6,13 +6,17 @@ export default function DrawingCanvas() {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
-    const [lineColour, setLineColour] = useState("#ffffff");
+    const [lineColour, setLineColour] = useState("#000000");
     const [lineWidth, setLineWidth] = useState("5");
-    const [backgroundColour, setBackgroundColour] = useState("black");
+    const [backgroundColour, setBackgroundColour] = useState("white");
     const [opacity, setOpacity] = useState(1.0);
     const [history, setHistory] = useState([]);
     const [redoHistory, setRedoHistory] = useState([]);
     const [compositeOperation, setCompositeOperation] = useState("source-over");
+    const hotspotX = (21.6 / 512) * 24; // Pen tip X
+    const hotspotY = (362.4 / 512) * 24; // Pen tip Y
+    // Pencil cursor
+    const [cursorStyle, setCursorStyle] = useState(`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 512 512'%3E%3Cpath d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4 .4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z' fill='black'/%3E%3C/svg%3E") ${hotspotX} ${hotspotY}, auto`);
 
     // Initialise canvas and update settings
     useEffect(() => {
@@ -160,10 +164,16 @@ export default function DrawingCanvas() {
 
     const eraser = () => {
         setCompositeOperation("destination-out");
+        setCursorStyle(
+            `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 576 512'%3E%3Cpath d='M290.7 57.4L57.4 290.7c-25 25-25 65.5 0 90.5l80 80c12 12 28.3 18.7 45.3 18.7L288 480l9.4 0L512 480c17.7 0 32-14.3 32-32s-14.3-32-32-32l-124.1 0L518.6 285.3c25-25 25-65.5 0-90.5L381.3 57.4c-25-25-65.5-25-90.5 0zM297.4 416l-9.4 0-105.4 0-80-80L227.3 211.3 364.7 348.7 297.4 416z' fill='black'/%3E%3C/svg%3E") ${hotspotX} ${hotspotY}, auto`
+        );
     };
 
     const drawing = () => {
         setCompositeOperation("source-over");
+        setCursorStyle(
+            `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 512 512'%3E%3Cpath d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4 .4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z' fill='black'/%3E%3C/svg%3E") ${hotspotX} ${hotspotY}, auto`
+        );
     };
 
     return (
@@ -189,7 +199,8 @@ export default function DrawingCanvas() {
                     border: "1px solid black",
                     backgroundColor: backgroundColour,
                     width: 1920,
-                    height: 1080
+                    height: 1080,
+                    cursor: cursorStyle,
                 }}
             />
         </div>
