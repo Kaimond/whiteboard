@@ -3,6 +3,8 @@ import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaEraser } from "react-icons/fa";
+import { FaUndo } from "react-icons/fa";
+import { FaRedo } from "react-icons/fa";
 
 export default function Toolbar({
     clearCanvas,
@@ -13,9 +15,10 @@ export default function Toolbar({
     setBackgroundColour,
     opacity,
     setOpacity,
+    undo,
+    redo,
 }) {
     const [activeTool, setActiveTool] = useState("draw");
-    const [hover, setHover] = useState(false);
     const [selectedColour, setSelectedColour] = useState("#ffffff");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#000000");
@@ -44,7 +47,13 @@ export default function Toolbar({
     };
 
     return (
-        <div style={{ marginBottom: "10px", backgroundColor: "#FFFFFF", color: "black", width: "700px", borderRadius: "10px" }}>
+        <div style={{
+            marginBottom: "10px",
+            backgroundColor: "#FFFFFF",
+            color: "black",
+            width: "800px",
+            borderRadius: "10px"
+        }}>
             <button
                 onClick={clearCanvas}
                 style={{
@@ -54,6 +63,26 @@ export default function Toolbar({
                 }}
             >
                 <FaTrash />
+            </button>
+            <button
+                onClick={undo}
+                style={{
+                    padding: "8px 16px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                <FaUndo />
+            </button>
+            <button
+                onClick={redo}
+                style={{
+                    padding: "8px 16px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                <FaRedo />
             </button>
             Line Colour:
             <input
@@ -69,7 +98,11 @@ export default function Toolbar({
                 onChange={handleWidthChange}
                 min={"1"}
                 max={"100"}
-                style={{ marginLeft: "4px", border: "2px solid white", verticalAlign: "middle" }}
+                style={{
+                    marginLeft: "4px",
+                    border: "2px solid white",
+                    verticalAlign: "middle",
+                }}
             />
             <button
                 onClick={() => { drawing(); setActiveTool("draw") }}
@@ -82,8 +115,6 @@ export default function Toolbar({
                     backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
                     borderRadius: activeTool === "draw" ? "4px" : "",
                 }}
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
             >
                 <FaPencilAlt />
             </button>
