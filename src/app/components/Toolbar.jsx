@@ -48,48 +48,27 @@ export default function Toolbar({
     };
 
     return (
-        <div style={{
-            marginBottom: "10px",
-            backgroundColor: "#FFFFFF",
-            color: "black",
-            width: "800px",
-            borderRadius: "10px"
-        }}>
+        <div className={styles.toolbar}>
             <div className={styles.tooltip} data-tooltip="Clear">
                 <button
+                    className={styles.button}
                     onClick={clearCanvas}
-                    style={{
-                        padding: "8px 16px",
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        fontSize: "20px",
-                    }}
                 >
                     <FaTrash />
                 </button >
             </div>
             <div className={styles.tooltip} data-tooltip="Undo">
                 <button
+                    className={styles.button}
                     onClick={undo}
-                    style={{
-                        padding: "8px 16px",
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        fontSize: "20px",
-                    }}
                 >
                     <FaUndo />
                 </button>
             </div>
             <div className={styles.tooltip} data-tooltip="Redo">
                 <button
+                    className={styles.button}
                     onClick={redo}
-                    style={{
-                        padding: "8px 16px",
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        fontSize: "20px",
-                    }}
                 >
                     <FaRedo />
                 </button>
@@ -116,12 +95,9 @@ export default function Toolbar({
             />
             <div className={styles.tooltip} data-tooltip="Draw">
                 <button
+                    className={styles.button}
                     onClick={() => { drawing(); setActiveTool("draw") }}
                     style={{
-                        padding: "8px",
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        fontSize: "20px",
                         color: activeTool === "draw" ? "#526EFF" : "",
                         backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
                         borderRadius: activeTool === "draw" ? "4px" : "",
@@ -132,12 +108,9 @@ export default function Toolbar({
             </div>
             <div className={styles.tooltip} data-tooltip="Erase">
                 <button
+                    className={styles.button}
                     onClick={() => { eraser(); setActiveTool("erase") }}
                     style={{
-                        padding: "8px",
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        fontSize: "20px",
                         color: activeTool === "erase" ? "#526EFF" : "",
                         backgroundColor: activeTool === "erase" ? "#e7ebfb" : "",
                         borderRadius: activeTool === "erase" ? "4px" : "",

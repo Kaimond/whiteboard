@@ -1,3 +1,12 @@
+.toolbar {
+    position: absolute;
+    margin-bottom: 10px;
+    background-color: #FFFFFF;
+    color: black;
+    width: 700px;
+    border: 4px;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;
@@ -19,4 +28,18 @@
     opacity: 0;
     transition: opacity 0.2s ease;
     opacity: 1;
+}
+
+.button {
+    padding: 8px;
+    margin-right: 10px;
+    font-size: 20px;
+    border-radius: 4px;
+}
+
+.button:hover {
+    cursor: pointer;
+    color: #526EFF;
+    background-color: #e7ebfb;
+    border-radius: 4px;
 }
