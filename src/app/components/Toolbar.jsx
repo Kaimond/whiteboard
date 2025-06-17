@@ -48,7 +48,19 @@ export default function Toolbar({
     };
 
     return (
-        <div className={styles.toolbar}>
+        <div style={{
+            position: "fixed",
+            left: "50%",
+            transform: "translate(-50%)",
+            bottom: "0px",
+            width: "700px",
+            marginBottom: "10px",
+            backgroundColor: "#fbfbfb",
+            color: "black",
+            border: "solid",
+            borderRadius: "4px",
+            borderColor: "#e4e4e4",
+        }}>
             <div className={styles.tooltip} data-tooltip="Clear">
                 <button
                     className={styles.button}
