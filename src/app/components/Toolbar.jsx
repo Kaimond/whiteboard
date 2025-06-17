@@ -5,6 +5,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import { FaEraser } from "react-icons/fa";
 import { FaUndo } from "react-icons/fa";
 import { FaRedo } from "react-icons/fa";
+import styles from "../Toolbar.module.css";
 
 export default function Toolbar({
     clearCanvas,
@@ -19,9 +20,9 @@ export default function Toolbar({
     redo,
 }) {
     const [activeTool, setActiveTool] = useState("draw");
-    const [selectedColour, setSelectedColour] = useState("#ffffff");
+    const [selectedColour, setSelectedColour] = useState("#000000");
     const [lineWidth, setLineWidth] = useState("5");
-    const [backgroundPickerColour, setBackgroundPickerColour] = useState("#000000");
+    const [backgroundPickerColour, setBackgroundPickerColour] = useState("#FFFFFF");
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
@@ -54,36 +55,45 @@ export default function Toolbar({
             width: "800px",
             borderRadius: "10px"
         }}>
-            <button
-                onClick={clearCanvas}
-                style={{
-                    padding: "8px 16px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                }}
-            >
-                <FaTrash />
-            </button>
-            <button
-                onClick={undo}
-                style={{
-                    padding: "8px 16px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                }}
-            >
-                <FaUndo />
-            </button>
-            <button
-                onClick={redo}
-                style={{
-                    padding: "8px 16px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                }}
-            >
-                <FaRedo />
-            </button>
+            <div className={styles.tooltip} data-tooltip="Clear">
+                <button
+                    onClick={clearCanvas}
+                    style={{
+                        padding: "8px 16px",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                    }}
+                >
+                    <FaTrash />
+                </button >
+            </div>
+            <div className={styles.tooltip} data-tooltip="Undo">
+                <button
+                    onClick={undo}
+                    style={{
+                        padding: "8px 16px",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                    }}
+                >
+                    <FaUndo />
+                </button>
+            </div>
+            <div className={styles.tooltip} data-tooltip="Redo">
+                <button
+                    onClick={redo}
+                    style={{
+                        padding: "8px 16px",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                    }}
+                >
+                    <FaRedo />
+                </button>
+            </div>
             Line Colour:
             <input
                 type="color"
@@ -104,34 +114,38 @@ export default function Toolbar({
                     verticalAlign: "middle",
                 }}
             />
-            <button
-                onClick={() => { drawing(); setActiveTool("draw") }}
-                style={{
-                    padding: "8px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                    fontSize: "20px",
-                    color: activeTool === "draw" ? "#526EFF" : "",
-                    backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
-                    borderRadius: activeTool === "draw" ? "4px" : "",
-                }}
-            >
-                <FaPencilAlt />
-            </button>
-            <button
-                onClick={() => { eraser(); setActiveTool("erase") }}
-                style={{
-                    padding: "8px",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                    fontSize: "20px",
-                    color: activeTool === "erase" ? "#526EFF" : "",
-                    backgroundColor: activeTool === "erase" ? "#e7ebfb" : "",
-                    borderRadius: activeTool === "erase" ? "4px" : "",
-                }}
-            >
-                <FaEraser />
-            </button>
+            <div className={styles.tooltip} data-tooltip="Draw">
+                <button
+                    onClick={() => { drawing(); setActiveTool("draw") }}
+                    style={{
+                        padding: "8px",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                        color: activeTool === "draw" ? "#526EFF" : "",
+                        backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
+                        borderRadius: activeTool === "draw" ? "4px" : "",
+                    }}
+                >
+                    <FaPencilAlt />
+                </button>
+            </div>
+            <div className={styles.tooltip} data-tooltip="Erase">
+                <button
+                    onClick={() => { eraser(); setActiveTool("erase") }}
+                    style={{
+                        padding: "8px",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                        color: activeTool === "erase" ? "#526EFF" : "",
+                        backgroundColor: activeTool === "erase" ? "#e7ebfb" : "",
+                        borderRadius: activeTool === "erase" ? "4px" : "",
+                    }}
+                >
+                    <FaEraser />
+                </button>
+            </div>
             <span>Background Colour:</span>
             <input
                 type="color"
