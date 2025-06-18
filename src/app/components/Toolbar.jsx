@@ -23,6 +23,7 @@ export default function Toolbar({
     const [selectedColour, setSelectedColour] = useState("#000000");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#FFFFFF");
+    const [showPenToolbar, setShowPenToolbar] = useState(false);
 
     const handleColourChange = (e) => {
         const newColour = e.target.value;
@@ -47,19 +48,25 @@ export default function Toolbar({
         setOpacity(newOpacity);
     };
 
+    const togglePenToolbar = () => {
+        setShowPenToolbar((prev) => !prev);
+        drawing();
+    };
+
     return (
         <div style={{
             position: "fixed",
+            width: "700px",
             left: "50%",
             transform: "translate(-50%)",
-            bottom: "0px",
-            width: "700px",
+            bottom: "50px",
             marginBottom: "10px",
             backgroundColor: "#fbfbfb",
             color: "black",
             border: "solid",
-            borderRadius: "4px",
+            borderRadius: "7px",
             borderColor: "#e4e4e4",
+            zIndex: 1,
         }}>
             <div className={styles.tooltip} data-tooltip="Clear">
                 <button
@@ -105,18 +112,60 @@ export default function Toolbar({
                     verticalAlign: "middle",
                 }}
             />
-            <div className={styles.tooltip} data-tooltip="Draw">
+            <div className={styles.penButtonContainer} style={{ position: "relative", display: "inline-block" }}>
                 <button
                     className={styles.button}
-                    onClick={() => { drawing(); setActiveTool("draw") }}
+                    onClick={togglePenToolbar}
                     style={{
                         color: activeTool === "draw" ? "#526EFF" : "",
                         backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
                         borderRadius: activeTool === "draw" ? "4px" : "",
+                        backgroundColor: showPenToolbar ? "#ddd" : "#fff",
                     }}
+                    title="Draw"
                 >
                     <FaPencilAlt />
                 </button>
+                {showPenToolbar && (
+                    <div
+                        className={styles.penToolbar}
+                        style={{
+                            position: "fixed",
+                            width: "700px",
+                            height: "80px",
+                            top: "-130%",
+                            left: "50%",
+                            transform: "translate(-50%)",
+                            backgroundColor: "#f3f3f3",
+                            border: "1px solid #dadada",
+                            padding: "10px",
+                            borderRadius: "7px",
+                            borderColor: "#e4e4e4",
+                            zIndex: -1,
+                        }}
+                    >
+                        Line Colour:
+                        <input
+                            type="color"
+                            value={selectedColour}
+                            onChange={handleColourChange}
+                            style={{ verticalAlign: "middle" }}
+                        />
+                        Line Width:
+                        <input
+                            type="number"
+                            value={lineWidth}
+                            onChange={handleWidthChange}
+                            min={"1"}
+                            max={"100"}
+                            style={{
+                                marginLeft: "4px",
+                                border: "2px solid white",
+                                verticalAlign: "middle",
+                            }}
+                        />
+                    </div>
+                )}
             </div>
             <div className={styles.tooltip} data-tooltip="Erase">
                 <button

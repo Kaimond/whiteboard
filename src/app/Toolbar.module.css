@@ -1,12 +1,3 @@
-.toolbar {
-    position: absolute;
-    margin-bottom: 10px;
-    background-color: #FFFFFF;
-    color: black;
-    width: 700px;
-    border: 4px;
-}
-
 .tooltip {
     position: relative;
     display: inline-block;
@@ -42,4 +33,16 @@
     color: #526EFF;
     background-color: #e7ebfb;
     border-radius: 4px;
+}
+
+.penButtonContainer {
+    position: relative;
+}
+
+.penToolbar {
+    transition: opacity 0.2s ease;
+}
+
+.penToolbar:hover {
+    opacity: 1;
 }
