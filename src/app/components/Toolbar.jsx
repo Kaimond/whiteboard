@@ -1,10 +1,6 @@
 "use client";
 import { useState } from "react";
-import { FaTrash } from "react-icons/fa";
-import { FaPencilAlt } from "react-icons/fa";
-import { FaEraser } from "react-icons/fa";
-import { FaUndo } from "react-icons/fa";
-import { FaRedo } from "react-icons/fa";
+import { FaPencilAlt, FaCircle, FaEraser, FaUndo, FaRedo, FaTrash } from "react-icons/fa";
 import styles from "../Toolbar.module.css";
 
 export default function Toolbar({
@@ -21,14 +17,33 @@ export default function Toolbar({
 }) {
     const [activeTool, setActiveTool] = useState("draw");
     const [selectedColour, setSelectedColour] = useState("#000000");
+    const [showPenToolbar, setShowPenToolbar] = useState(false);
+    const [selectedPreset, setSelectedPreset] = useState("#000000");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#FFFFFF");
-    const [showPenToolbar, setShowPenToolbar] = useState(false);
 
-    const handleColourChange = (e) => {
-        const newColour = e.target.value;
-        setSelectedColour(newColour);
-        setColour(newColour);
+    const togglePenToolbar = () => {
+        setShowPenToolbar((prev) => !prev);
+        drawing();
+    };
+
+    const presetColours = [
+        { name: "Black", hex: "#000000" },
+        { name: "White", hex: "#FFFFFF" },
+        { name: "Red", hex: "#ff0000" },
+        { name: "Orange", hex: "#FFA500" },
+        { name: "Green", hex: "#00ff00" },
+        { name: "Blue", hex: "#0000ff" },
+        { name: "Light blue", hex: "#90D5FF" },
+        { name: "Purple", hex: "#800080" },
+        { name: "Pink", hex: "#FF00FF" },
+        { name: "Yellow", hex: "#ffff00" },
+    ];
+
+    const handleColourChange = (colour, isPreset = false) => {
+        setSelectedColour(colour);
+        setColour(colour);
+        setSelectedPreset(isPreset ? colour : null);
     };
 
     const handleWidthChange = (e) => {
@@ -46,11 +61,6 @@ export default function Toolbar({
     const handleOpacityChange = (e) => {
         const newOpacity = e.target.value / 100;
         setOpacity(newOpacity);
-    };
-
-    const togglePenToolbar = () => {
-        setShowPenToolbar((prev) => !prev);
-        drawing();
     };
 
     return (
@@ -132,8 +142,8 @@ export default function Toolbar({
                         style={{
                             position: "fixed",
                             width: "700px",
-                            height: "80px",
-                            top: "-130%",
+                            height: "90px",
+                            top: "-150%",
                             left: "50%",
                             transform: "translate(-50%)",
                             backgroundColor: "#f3f3f3",
@@ -142,28 +152,28 @@ export default function Toolbar({
                             borderRadius: "7px",
                             borderColor: "#e4e4e4",
                             zIndex: -1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                         }}
                     >
-                        Line Colour:
-                        <input
-                            type="color"
-                            value={selectedColour}
-                            onChange={handleColourChange}
-                            style={{ verticalAlign: "middle" }}
-                        />
-                        Line Width:
-                        <input
-                            type="number"
-                            value={lineWidth}
-                            onChange={handleWidthChange}
-                            min={"1"}
-                            max={"100"}
-                            style={{
-                                marginLeft: "4px",
-                                border: "2px solid white",
-                                verticalAlign: "middle",
-                            }}
-                        />
+                        <div className={styles.colourContainer}>
+                            {presetColours.map((color) => (
+                                <FaCircle
+                                    key={color.hex}
+                                    onClick={() => handleColourChange(color.hex, true)}
+                                    className={styles.presetColourButton}
+                                    style={{
+                                        color: color.hex,
+                                        border: selectedPreset === color.hex ? "2px solid #f3f3f3" : "",
+                                        boxShadow: selectedPreset === color.hex ? "0 0 0 3px #526EFF" : "none",
+                                        cursor: "pointer",
+                                        borderRadius: "50%",
+                                    }}
+                                    title={`${color.name}`}
+                                />
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
@@ -196,6 +206,6 @@ export default function Toolbar({
                 onChange={handleOpacityChange}
                 style={{ verticalAlign: "middle" }}
             />
-        </div>
+        </div >
     );
 }
