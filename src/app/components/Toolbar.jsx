@@ -122,9 +122,7 @@ export default function Toolbar({
                 </button>
             </div>
             {showPenToolbar && (
-                <div
-                    className={styles.penToolbar}
-                >
+                <div className={styles.penToolbar}>
                     <div className={styles.colourContainer}>
                         {presetColours.map((colour) => (
                             <FaCircle
@@ -133,8 +131,8 @@ export default function Toolbar({
                                 className={styles.presetColourButton}
                                 style={{
                                     color: colour.hex,
-                                    border: selectedColour === colour.hex ? "2px solid #f3f3f3" : "",
-                                    boxShadow: selectedColour === colour.hex ? "0 0 0 3px #526EFF" : "none",
+                                    outline: selectedColour === colour.hex ? "2px solid #f3f3f3" : "",
+                                    boxShadow: selectedColour === colour.hex ? "0 0 0 5px #526EFF" : "none",
                                     cursor: "pointer",
                                     borderRadius: "50%",
                                 }}
@@ -158,6 +156,25 @@ export default function Toolbar({
                             />
                         ))}
                     </div>
+                    <div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={opacity * 100}
+                            onChange={handleOpacityChange}
+                            style={{
+                                verticalAlign: "middle",
+                                appearance: "none",
+                                height: "10px",
+                                borderRadius: "10px",
+                                background: `linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)`,
+                                outline: "none",
+                                boxShadow: "none",
+                                cursor: "pointer",
+                            }}
+                        />
+                    </div>
                 </div>
             )}
             <div className={styles.tooltip} data-tooltip="Erase">
@@ -178,15 +195,6 @@ export default function Toolbar({
                 type="color"
                 value={backgroundPickerColour}
                 onChange={handleBackgroundColourChange}
-                style={{ verticalAlign: "middle" }}
-            />
-            <span style={{ marginRight: "10px" }}>Opacity: {(opacity * 100).toFixed(0)}%</span>
-            <input
-                type="range"
-                min="0"
-                max="100"
-                value={opacity * 100}
-                onChange={handleOpacityChange}
                 style={{ verticalAlign: "middle" }}
             />
         </div >
