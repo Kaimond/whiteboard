@@ -18,7 +18,6 @@ export default function Toolbar({
     const [activeTool, setActiveTool] = useState("draw");
     const [selectedColour, setSelectedColour] = useState("#000000");
     const [showPenToolbar, setShowPenToolbar] = useState(false);
-    const [selectedPreset, setSelectedPreset] = useState("#000000");
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#FFFFFF");
 
@@ -40,16 +39,22 @@ export default function Toolbar({
         { name: "Yellow", hex: "#ffff00" },
     ];
 
-    const handleColourChange = (colour, isPreset = false) => {
+    const presetSize = [
+        { size: "5", preview: "15px" },
+        { size: "10", preview: "20px" },
+        { size: "15", preview: "25px" },
+        { size: "20", preview: "30px" },
+        { size: "25", preview: "35px" },
+    ];
+
+    const handleColourChange = (colour) => {
         setSelectedColour(colour);
         setColour(colour);
-        setSelectedPreset(isPreset ? colour : null);
     };
 
-    const handleWidthChange = (e) => {
-        const newWidth = e.target.value;
-        setLineWidth(newWidth);
-        setWidth(newWidth);
+    const handleWidthChange = (size) => {
+        setLineWidth(size);
+        setWidth(size);
     };
 
     const handleBackgroundColourChange = (e) => {
@@ -158,19 +163,35 @@ export default function Toolbar({
                         }}
                     >
                         <div className={styles.colourContainer}>
-                            {presetColours.map((color) => (
+                            {presetColours.map((colour) => (
                                 <FaCircle
-                                    key={color.hex}
-                                    onClick={() => handleColourChange(color.hex, true)}
+                                    key={colour.hex}
+                                    onClick={() => handleColourChange(colour.hex)}
                                     className={styles.presetColourButton}
                                     style={{
-                                        color: color.hex,
-                                        border: selectedPreset === color.hex ? "2px solid #f3f3f3" : "",
-                                        boxShadow: selectedPreset === color.hex ? "0 0 0 3px #526EFF" : "none",
+                                        color: colour.hex,
+                                        border: selectedColour === colour.hex ? "2px solid #f3f3f3" : "",
+                                        boxShadow: selectedColour === colour.hex ? "0 0 0 3px #526EFF" : "none",
                                         cursor: "pointer",
                                         borderRadius: "50%",
                                     }}
-                                    title={`${color.name}`}
+                                    title={`${colour.name}`}
+                                />
+                            ))}
+                        </div>
+                        <div className={styles.sizeContainer}>
+                            {presetSize.map((size) => (
+                                <FaCircle
+                                    key={size.size}
+                                    onClick={() => handleWidthChange(size.size)}
+                                    style={{
+                                        fontSize: size.preview,
+                                        color: selectedColour,
+                                        outline: lineWidth === size.size ? "2px solid #f3f3f3" : "",
+                                        boxShadow: lineWidth === size.size ? "0 0 0 5px #526EFF" : "none",
+                                        cursor: "pointer",
+                                        borderRadius: "50%",
+                                    }}
                                 />
                             ))}
                         </div>
