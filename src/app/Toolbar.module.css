@@ -39,7 +39,7 @@
     position: fixed;
     width: 700px;
     height: 90px;
-    top: -150%;
+    top: -300%;
     left: 50%;
     transform: translate(-50%);
     background-color: #f3f3f3;
