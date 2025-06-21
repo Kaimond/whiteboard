@@ -107,97 +107,59 @@ export default function Toolbar({
                     <FaRedo />
                 </button>
             </div>
-            Line Colour:
-            <input
-                type="color"
-                value={selectedColour}
-                onChange={handleColourChange}
-                style={{ verticalAlign: "middle" }}
-            />
-            Line Width:
-            <input
-                type="number"
-                value={lineWidth}
-                onChange={handleWidthChange}
-                min={"1"}
-                max={"100"}
-                style={{
-                    marginLeft: "4px",
-                    border: "2px solid white",
-                    verticalAlign: "middle",
-                }}
-            />
-            <div className={styles.penButtonContainer} style={{ position: "relative", display: "inline-block" }}>
+            <div className={styles.tooltip} data-tooltip="Draw">
                 <button
                     className={styles.button}
-                    onClick={togglePenToolbar}
+                    onClick={() => { togglePenToolbar(); setActiveTool("draw") }}
                     style={{
                         color: activeTool === "draw" ? "#526EFF" : "",
                         backgroundColor: activeTool === "draw" ? "#e7ebfb" : "",
                         borderRadius: activeTool === "draw" ? "4px" : "",
-                        backgroundColor: showPenToolbar ? "#ddd" : "#fff",
                     }}
                     title="Draw"
                 >
                     <FaPencilAlt />
                 </button>
-                {showPenToolbar && (
-                    <div
-                        className={styles.penToolbar}
-                        style={{
-                            position: "fixed",
-                            width: "700px",
-                            height: "90px",
-                            top: "-150%",
-                            left: "50%",
-                            transform: "translate(-50%)",
-                            backgroundColor: "#f3f3f3",
-                            border: "1px solid #dadada",
-                            padding: "10px",
-                            borderRadius: "7px",
-                            borderColor: "#e4e4e4",
-                            zIndex: -1,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <div className={styles.colourContainer}>
-                            {presetColours.map((colour) => (
-                                <FaCircle
-                                    key={colour.hex}
-                                    onClick={() => handleColourChange(colour.hex)}
-                                    className={styles.presetColourButton}
-                                    style={{
-                                        color: colour.hex,
-                                        border: selectedColour === colour.hex ? "2px solid #f3f3f3" : "",
-                                        boxShadow: selectedColour === colour.hex ? "0 0 0 3px #526EFF" : "none",
-                                        cursor: "pointer",
-                                        borderRadius: "50%",
-                                    }}
-                                    title={`${colour.name}`}
-                                />
-                            ))}
-                        </div>
-                        <div className={styles.sizeContainer}>
-                            {presetSize.map((size) => (
-                                <FaCircle
-                                    key={size.size}
-                                    onClick={() => handleWidthChange(size.size)}
-                                    style={{
-                                        fontSize: size.preview,
-                                        color: selectedColour,
-                                        outline: lineWidth === size.size ? "2px solid #f3f3f3" : "",
-                                        boxShadow: lineWidth === size.size ? "0 0 0 5px #526EFF" : "none",
-                                        cursor: "pointer",
-                                        borderRadius: "50%",
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
+            {showPenToolbar && (
+                <div
+                    className={styles.penToolbar}
+                >
+                    <div className={styles.colourContainer}>
+                        {presetColours.map((colour) => (
+                            <FaCircle
+                                key={colour.hex}
+                                onClick={() => handleColourChange(colour.hex)}
+                                className={styles.presetColourButton}
+                                style={{
+                                    color: colour.hex,
+                                    border: selectedColour === colour.hex ? "2px solid #f3f3f3" : "",
+                                    boxShadow: selectedColour === colour.hex ? "0 0 0 3px #526EFF" : "none",
+                                    cursor: "pointer",
+                                    borderRadius: "50%",
+                                }}
+                                title={`${colour.name}`}
+                            />
+                        ))}
+                    </div>
+                    <div className={styles.sizeContainer}>
+                        {presetSize.map((size) => (
+                            <FaCircle
+                                key={size.size}
+                                onClick={() => handleWidthChange(size.size)}
+                                style={{
+                                    fontSize: size.preview,
+                                    color: selectedColour,
+                                    outline: lineWidth === size.size ? "2px solid #f3f3f3" : "",
+                                    boxShadow: lineWidth === size.size ? "0 0 0 5px #526EFF" : "none",
+                                    cursor: "pointer",
+                                    borderRadius: "50%",
+                                }}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
             <div className={styles.tooltip} data-tooltip="Erase">
                 <button
                     className={styles.button}

@@ -35,11 +35,22 @@
     border-radius: 4px;
 }
 
-.penButtonContainer {
-    position: relative;
-}
-
 .penToolbar {
+    position: fixed;
+    width: 700px;
+    height: 90px;
+    top: -150%;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: #f3f3f3;
+    border: 1px solid #dadada;
+    padding: 10px;
+    border-radius: 7px;
+    border-color: #e4e4e4;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     transition: opacity 0.2s ease;
 }
 
