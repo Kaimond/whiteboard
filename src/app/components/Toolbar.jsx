@@ -88,7 +88,7 @@ export default function Toolbar({
                     <FaTrash />
                 </button >
             </div>
-            <div className={styles.tooltip} data-tooltip="Undo">
+            <div className={styles.tooltip} data-tooltip="Undo (Ctrl + Z)">
                 <button
                     className={styles.button}
                     onClick={undo}
@@ -96,7 +96,7 @@ export default function Toolbar({
                     <FaUndo />
                 </button>
             </div>
-            <div className={styles.tooltip} data-tooltip="Redo">
+            <div className={styles.tooltip} data-tooltip="Redo (Ctrl + Shift + Z)">
                 <button
                     className={styles.button}
                     onClick={redo}
