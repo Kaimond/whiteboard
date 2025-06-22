@@ -157,12 +157,15 @@ export default function DrawingCanvas() {
     };
 
     const clearCanvas = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL();
-        setHistory([dataUrl]); // Reset history with cleared state
-        setRedoHistory([]);
+        if (window.confirm('Are you sure you want to clear canvas?')) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL();
+            setHistory([dataUrl]); // Reset history with cleared state
+            setRedoHistory([]);
+        }
+        return;
     };
 
     const eraser = () => {
