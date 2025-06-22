@@ -5,6 +5,8 @@ import styles from "../Toolbar.module.css";
 
 export default function Toolbar({
     clearCanvas,
+    activeTool,
+    setActiveTool,
     setColour,
     setWidth,
     eraser,
@@ -15,7 +17,6 @@ export default function Toolbar({
     undo,
     redo,
 }) {
-    const [activeTool, setActiveTool] = useState("draw");
     const [selectedColour, setSelectedColour] = useState("#000000");
     const [showPenToolbar, setShowPenToolbar] = useState(true);
     const [lineWidth, setLineWidth] = useState("5");
@@ -23,6 +24,7 @@ export default function Toolbar({
 
     const togglePenToolbar = () => {
         setShowPenToolbar(true);
+        setActiveTool("draw");
         drawing();
     };
 
