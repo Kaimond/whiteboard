@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPencilAlt, FaCircle, FaEraser, FaUndo, FaRedo, FaTrash } from "react-icons/fa";
 import styles from "../Toolbar.module.css";
 
@@ -65,24 +65,21 @@ export default function Toolbar({
 
     const handleOpacityChange = (e) => {
         const newOpacity = e.target.value / 100;
-        setOpacity(newOpacity);
+        if (activeTool === "draw") {
+            setOpacity(newOpacity);
+        } else {
+            setOpacity(1);
+        }
     };
 
+    useEffect(() => {
+        if (activeTool === "erase") {
+            setOpacity(1); // Reset opacity to 1 when switching to eraser
+        }
+    }, [activeTool]);
+
     return (
-        <div style={{
-            position: "fixed",
-            width: "700px",
-            left: "50%",
-            transform: "translate(-50%)",
-            bottom: "50px",
-            marginBottom: "10px",
-            backgroundColor: "#fbfbfb",
-            color: "black",
-            border: "solid",
-            borderRadius: "7px",
-            borderColor: "#e4e4e4",
-            zIndex: 1,
-        }}>
+        <div className={styles.toolbar}>
             <div className={styles.tooltip} data-tooltip="Clear">
                 <button
                     className={styles.button}
