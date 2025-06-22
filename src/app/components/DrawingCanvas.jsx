@@ -214,25 +214,27 @@ export default function DrawingCanvas() {
     return (
         <div>
             <TopToolbar
+                clearCanvas={clearCanvas}
+                undo={undo}
+                redo={redo}
                 showToolbar={showToolbar}
                 setShowToolbar={setShowToolbar}
             />
+
             {showToolbar && (
                 <Toolbar
-                    clearCanvas={clearCanvas}
+                    activeTool={activeTool}
+                    setActiveTool={setActiveTool}
+                    drawing={drawing}
+                    eraser={eraser}
                     setColour={setLineColour}
                     setWidth={setLineWidth}
-                    eraser={eraser}
-                    drawing={drawing}
                     setBackgroundColour={setBackgroundColour}
                     opacity={opacity}
                     setOpacity={setOpacity}
-                    undo={undo}
-                    redo={redo}
-                    activeTool={activeTool}
-                    setActiveTool={setActiveTool}
                 />
             )}
+
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}

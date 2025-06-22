@@ -1,21 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FaPencilAlt, FaCircle, FaEraser, FaUndo, FaRedo, FaTrash } from "react-icons/fa";
+import { FaPencilAlt, FaCircle, FaEraser } from "react-icons/fa";
 import styles from "../Toolbar.module.css";
 
 export default function Toolbar({
-    clearCanvas,
     activeTool,
     setActiveTool,
+    drawing,
+    eraser,
     setColour,
     setWidth,
-    eraser,
-    drawing,
     setBackgroundColour,
     opacity,
     setOpacity,
-    undo,
-    redo,
 }) {
     const [selectedColour, setSelectedColour] = useState("#000000");
     const [showPenToolbar, setShowPenToolbar] = useState(true);
@@ -82,30 +79,6 @@ export default function Toolbar({
 
     return (
         <div className={styles.toolbar}>
-            <div className={styles.tooltip} data-tooltip="Clear (Ctrl + Del)">
-                <button
-                    className={styles.button}
-                    onClick={clearCanvas}
-                >
-                    <FaTrash />
-                </button >
-            </div>
-            <div className={styles.tooltip} data-tooltip="Undo (Ctrl + Z)">
-                <button
-                    className={styles.button}
-                    onClick={undo}
-                >
-                    <FaUndo />
-                </button>
-            </div>
-            <div className={styles.tooltip} data-tooltip="Redo (Ctrl + Shift + Z)">
-                <button
-                    className={styles.button}
-                    onClick={redo}
-                >
-                    <FaRedo />
-                </button>
-            </div>
             <div className={styles.tooltip} data-tooltip="Draw (D)">
                 <button
                     className={styles.button}
@@ -139,6 +112,7 @@ export default function Toolbar({
                             />
                         ))}
                     </div>
+
                     <div className={styles.sizeContainer}>
                         {presetSize.map((size) => (
                             <FaCircle
@@ -155,6 +129,7 @@ export default function Toolbar({
                             />
                         ))}
                     </div>
+
                     <div>
                         <input
                             type="range"
@@ -176,6 +151,7 @@ export default function Toolbar({
                     </div>
                 </div>
             )}
+
             <div className={styles.tooltip} data-tooltip="Erase (E)">
                 <button
                     className={styles.button}
@@ -189,6 +165,7 @@ export default function Toolbar({
                     <FaEraser />
                 </button>
             </div>
+
             <span>Background Colour:</span>
             <input
                 type="color"
