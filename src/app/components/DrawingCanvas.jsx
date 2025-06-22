@@ -117,6 +117,24 @@ export default function DrawingCanvas() {
         };
     };
 
+    useEffect(() => {
+        const handleKeydown = (event) => {
+            if (event.ctrlKey && event.key === "z") {
+                undo();
+            }
+
+            if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "z") {
+                redo();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [history, redoHistory]);
+
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
         setIsDrawing(true);
