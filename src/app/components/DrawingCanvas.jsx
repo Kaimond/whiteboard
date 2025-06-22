@@ -4,6 +4,7 @@ import Toolbar from "./Toolbar";
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
+    const [activeTool, setActiveTool] = useState("draw");
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
     const [lineColour, setLineColour] = useState("#000000");
@@ -184,10 +185,12 @@ export default function DrawingCanvas() {
 
             if (event.key.toLowerCase() === "d") {
                 drawing();
+                setActiveTool("draw");
             }
 
             if (event.key.toLowerCase() === "e") {
                 eraser();
+                setActiveTool("erase");
             }
 
             if (event.ctrlKey && event.key === "z") {
@@ -219,6 +222,8 @@ export default function DrawingCanvas() {
                 setOpacity={setOpacity}
                 undo={undo}
                 redo={redo}
+                activeTool={activeTool}
+                setActiveTool={setActiveTool}
             />
             <canvas
                 ref={canvasRef}
