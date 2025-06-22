@@ -1,3 +1,21 @@
+.toolbar {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 700px;
+    height: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 50px;
+    margin-bottom: 10px;
+    background-color: #fbfbfb;
+    color: black;
+    border: solid;
+    border-radius: 7px;
+    border-color: #e4e4e4;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;
@@ -15,10 +33,6 @@
     border-radius: 4px;
     font-size: 12px;
     white-space: nowrap;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    opacity: 1;
 }
 
 .button {
@@ -39,15 +53,14 @@
     position: fixed;
     width: 700px;
     height: 90px;
-    top: -300%;
+    top: -150%;
     left: 50%;
     transform: translate(-50%);
     background-color: #f3f3f3;
-    border: 1px solid #dadada;
+    border: solid #dadada;
     padding: 10px;
     border-radius: 7px;
     border-color: #e4e4e4;
-    z-index: -1;
     display: flex;
     align-items: center;
     justify-content: space-between;
