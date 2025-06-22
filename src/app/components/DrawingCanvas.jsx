@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Toolbar from "./Toolbar";
+import TopToolbar from "./TopToolbar"
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
+    const [showToolbar, setShowToolbar] = useState(true);
     const [activeTool, setActiveTool] = useState("draw");
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
@@ -211,20 +213,26 @@ export default function DrawingCanvas() {
 
     return (
         <div>
-            <Toolbar
-                clearCanvas={clearCanvas}
-                setColour={setLineColour}
-                setWidth={setLineWidth}
-                eraser={eraser}
-                drawing={drawing}
-                setBackgroundColour={setBackgroundColour}
-                opacity={opacity}
-                setOpacity={setOpacity}
-                undo={undo}
-                redo={redo}
-                activeTool={activeTool}
-                setActiveTool={setActiveTool}
+            <TopToolbar
+                showToolbar={showToolbar}
+                setShowToolbar={setShowToolbar}
             />
+            {showToolbar && (
+                <Toolbar
+                    clearCanvas={clearCanvas}
+                    setColour={setLineColour}
+                    setWidth={setLineWidth}
+                    eraser={eraser}
+                    drawing={drawing}
+                    setBackgroundColour={setBackgroundColour}
+                    opacity={opacity}
+                    setOpacity={setOpacity}
+                    undo={undo}
+                    redo={redo}
+                    activeTool={activeTool}
+                    setActiveTool={setActiveTool}
+                />
+            )}
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
