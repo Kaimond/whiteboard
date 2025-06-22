@@ -80,7 +80,7 @@ export default function Toolbar({
 
     return (
         <div className={styles.toolbar}>
-            <div className={styles.tooltip} data-tooltip="Clear">
+            <div className={styles.tooltip} data-tooltip="Clear (Ctrl + Del)">
                 <button
                     className={styles.button}
                     onClick={clearCanvas}
@@ -104,7 +104,7 @@ export default function Toolbar({
                     <FaRedo />
                 </button>
             </div>
-            <div className={styles.tooltip} data-tooltip="Draw">
+            <div className={styles.tooltip} data-tooltip="Draw (D)">
                 <button
                     className={styles.button}
                     onClick={() => { togglePenToolbar(); setActiveTool("draw") }}
@@ -174,7 +174,7 @@ export default function Toolbar({
                     </div>
                 </div>
             )}
-            <div className={styles.tooltip} data-tooltip="Erase">
+            <div className={styles.tooltip} data-tooltip="Erase (E)">
                 <button
                     className={styles.button}
                     onClick={() => { eraser(); setActiveTool("erase") }}
