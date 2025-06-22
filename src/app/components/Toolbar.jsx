@@ -17,12 +17,12 @@ export default function Toolbar({
 }) {
     const [activeTool, setActiveTool] = useState("draw");
     const [selectedColour, setSelectedColour] = useState("#000000");
-    const [showPenToolbar, setShowPenToolbar] = useState(false);
+    const [showPenToolbar, setShowPenToolbar] = useState(true);
     const [lineWidth, setLineWidth] = useState("5");
     const [backgroundPickerColour, setBackgroundPickerColour] = useState("#FFFFFF");
 
     const togglePenToolbar = () => {
-        setShowPenToolbar((prev) => !prev);
+        setShowPenToolbar(true);
         drawing();
     };
 
@@ -118,7 +118,7 @@ export default function Toolbar({
                     <FaPencilAlt />
                 </button>
             </div>
-            {showPenToolbar && (
+            {showPenToolbar && activeTool === "draw" && (
                 <div className={styles.penToolbar}>
                     <div className={styles.colourContainer}>
                         {presetColours.map((colour) => (
