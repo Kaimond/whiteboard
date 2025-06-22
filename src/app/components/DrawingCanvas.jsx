@@ -120,6 +120,39 @@ export default function DrawingCanvas() {
         };
     };
 
+    const clearCanvas = () => {
+        if (window.confirm('Are you sure you want to clear canvas?')) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL();
+            setHistory([dataUrl]); // Reset history with cleared state
+            setRedoHistory([]);
+        }
+        return;
+    };
+
+    const download = () => {
+        const canvas = canvasRef.current;
+        const backgroundColor = backgroundColour;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        tempCtx.fillStyle = backgroundColor;
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        tempCtx.drawImage(canvas, 0, 0);
+
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = 'Whiteboard.png';
+        link.href = dataUrl;
+        link.click();
+    }
+
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
         setIsDrawing(true);
@@ -154,18 +187,6 @@ export default function DrawingCanvas() {
         ctx.lineTo(x1, y1);
         ctx.stroke();
         ctx.closePath();
-    };
-
-    const clearCanvas = () => {
-        if (window.confirm('Are you sure you want to clear canvas?')) {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL();
-            setHistory([dataUrl]); // Reset history with cleared state
-            setRedoHistory([]);
-        }
-        return;
     };
 
     const eraser = () => {
@@ -217,10 +238,11 @@ export default function DrawingCanvas() {
     return (
         <div>
             <TopToolbar
-                clearCanvas={clearCanvas}
                 undo={undo}
                 redo={redo}
                 showToolbar={showToolbar}
+                clearCanvas={clearCanvas}
+                download={download}
                 setShowToolbar={setShowToolbar}
             />
 
