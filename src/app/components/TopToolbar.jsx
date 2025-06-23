@@ -47,7 +47,7 @@ export default function TopToolbar({
                 </button >
             </div>
 
-            <div className={styles.tooltip} data-tooltip="Save image">
+            <div className={styles.tooltip} data-tooltip="Save image (Ctrl + Alt + S)">
                 <button
                     className={styles.button}
                     onClick={download}
