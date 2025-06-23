@@ -205,8 +205,20 @@ export default function DrawingCanvas() {
 
     useEffect(() => {
         const handleKeydown = (event) => {
+            if (event.ctrlKey && event.key === "z") {
+                undo();
+            }
+
+            if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "z") {
+                redo();
+            }
+
             if (event.ctrlKey && event.key === "Delete") {
                 clearCanvas();
+            }
+
+            if (event.ctrlKey && event.altKey && event.key === "s") {
+                download();
             }
 
             if (event.key.toLowerCase() === "d") {
@@ -217,14 +229,6 @@ export default function DrawingCanvas() {
             if (event.key.toLowerCase() === "e") {
                 eraser();
                 setActiveTool("erase");
-            }
-
-            if (event.ctrlKey && event.key === "z") {
-                undo();
-            }
-
-            if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "z") {
-                redo();
             }
         };
 
@@ -266,7 +270,6 @@ export default function DrawingCanvas() {
                 onMouseUp={stopDrawing}
                 onMouseMove={draw}
                 style={{
-                    border: "1px solid black",
                     backgroundColor: backgroundColour,
                     width: 1920,
                     height: 1080,
