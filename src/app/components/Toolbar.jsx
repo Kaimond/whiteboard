@@ -93,6 +93,7 @@ export default function Toolbar({
                     <FaPencilAlt />
                 </button>
             </div>
+
             {showPenToolbar && activeTool === "draw" && (
                 <div className={styles.penToolbar}>
                     <div className={styles.colourContainer}>
@@ -109,23 +110,6 @@ export default function Toolbar({
                                     borderRadius: "50%",
                                 }}
                                 title={`${colour.name}`}
-                            />
-                        ))}
-                    </div>
-
-                    <div className={styles.sizeContainer}>
-                        {presetSize.map((size) => (
-                            <FaCircle
-                                key={size.size}
-                                onClick={() => handleWidthChange(size.size)}
-                                style={{
-                                    fontSize: size.preview,
-                                    color: selectedColour,
-                                    outline: lineWidth === size.size ? "2px solid #f3f3f3" : "",
-                                    boxShadow: lineWidth === size.size ? "0 0 0 5px #526EFF" : "none",
-                                    cursor: "pointer",
-                                    borderRadius: "50%",
-                                }}
                             />
                         ))}
                     </div>
@@ -164,6 +148,23 @@ export default function Toolbar({
                 >
                     <FaEraser />
                 </button>
+            </div>
+
+            <div className={styles.sizeContainer}>
+                {presetSize.map((size) => (
+                    <FaCircle
+                        key={size.size}
+                        onClick={() => handleWidthChange(size.size)}
+                        style={{
+                            fontSize: size.preview,
+                            color: selectedColour,
+                            outline: lineWidth === size.size ? "2px solid #f3f3f3" : "",
+                            boxShadow: lineWidth === size.size ? "0 0 0 5px #526EFF" : "none",
+                            cursor: "pointer",
+                            borderRadius: "50%",
+                        }}
+                    />
+                ))}
             </div>
 
             <span>Background Colour:</span>
