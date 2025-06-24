@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
 import Toolbar from "./Toolbar";
 import TopToolbar from "./TopToolbar"
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
+    const socketRef = useRef(null);
     const [showToolbar, setShowToolbar] = useState(true);
     const [activeTool, setActiveTool] = useState("draw");
     const [isDrawing, setIsDrawing] = useState(false);
@@ -20,6 +22,14 @@ export default function DrawingCanvas() {
     const hotspotY = (362.4 / 512) * 24; // Pen tip Y
     // Pencil cursor
     const [cursorStyle, setCursorStyle] = useState(`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 512 512'%3E%3Cpath d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4 .4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z' fill='black'/%3E%3C/svg%3E") ${hotspotX} ${hotspotY}, auto`);
+
+    useEffect(() => {
+        socketRef.current = io("http://localhost:3001");
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, []);
+
     // Initialise canvas and update settings
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -34,9 +44,50 @@ export default function DrawingCanvas() {
         ctx.globalAlpha = opacity;
         ctx.globalCompositeOperation = compositeOperation;
 
+        socketRef.current = io("http://localhost:3001");
+
+        // Handle initial canvas state
+        socketRef.current.on("initCanvas", (dataUrl) => {
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+        });
+
+        // Handle incoming draw events
+        socketRef.current.on("draw", (data) => {
+            const ctx = canvasRef.current.getContext("2d");
+            drawLine(ctx, data.x0, data.y0, data.x1, data.y1, data);
+        });
+
+        // Handle canvas clear
+        socketRef.current.on("clearCanvas", () => {
+            const ctx = canvasRef.current.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            setHistory([canvas.toDataURL()]);
+            setRedoHistory([]);
+        });
+
+        // Handle canvas state update
+        socketRef.current.on("updateCanvasState", (dataUrl) => {
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+        });
+
         // Save initial blank state
         const initialState = canvas.toDataURL();
         setHistory([initialState]);
+
+        // Cleanup on unmount
+        return () => {
+            socketRef.current.disconnect();
+        };
     }, []);
 
     // Update canvas context settings
@@ -49,6 +100,31 @@ export default function DrawingCanvas() {
         ctx.globalCompositeOperation = compositeOperation;
     }, [lineColour, lineWidth, opacity, compositeOperation]);
 
+    useEffect(() => {
+        const socket = socketRef.current;
+        socket.on('draw', (drawData) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            drawLine(ctx, drawData.x0, drawData.y0, drawData.x1, drawData.y1, drawData);
+        });
+
+        socket.on('canvas-state', (canvasState) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.src = canvasState;
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+        });
+
+        return () => {
+            socket.off('draw');
+            socket.off('canvas-state');
+        };
+    }, []);
+
     const saveState = () => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
@@ -60,6 +136,7 @@ export default function DrawingCanvas() {
             if (prev.length > 0 && prev[prev.length - 1] === dataUrl) {
                 return prev;
             }
+            socketRef.current.emit("updateCanvasState", dataUrl); // Send state to server
             return [...prev, dataUrl];
         });
         setRedoHistory([]); // Clear redo history
