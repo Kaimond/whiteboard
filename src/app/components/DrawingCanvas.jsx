@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Toolbar from "./Toolbar";
-import TopToolbar from "./TopToolbar"
+import TopToolbar from "./TopToolbar";
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
@@ -17,18 +17,13 @@ export default function DrawingCanvas() {
     const [opacity, setOpacity] = useState(1.0);
     const [history, setHistory] = useState([]);
     const [redoHistory, setRedoHistory] = useState([]);
+    const [currentStroke, setCurrentStroke] = useState([]);
+    const [userId, setUserId] = useState(null);
     const [compositeOperation, setCompositeOperation] = useState("source-over");
     const hotspotX = (21.6 / 512) * 24; // Pen tip X
     const hotspotY = (362.4 / 512) * 24; // Pen tip Y
     // Pencil cursor
     const [cursorStyle, setCursorStyle] = useState(`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 512 512'%3E%3Cpath d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4 .4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z' fill='black'/%3E%3C/svg%3E") ${hotspotX} ${hotspotY}, auto`);
-
-    useEffect(() => {
-        socketRef.current = io("http://localhost:3001");
-        return () => {
-            socketRef.current.disconnect();
-        };
-    }, []);
 
     // Initialise canvas and update settings
     useEffect(() => {
@@ -44,45 +39,56 @@ export default function DrawingCanvas() {
         ctx.globalAlpha = opacity;
         ctx.globalCompositeOperation = compositeOperation;
 
+        // Connect to WebSocket server
         socketRef.current = io("http://localhost:3001");
 
-        // Handle initial canvas state
-        socketRef.current.on("initCanvas", (dataUrl) => {
-            const img = new Image();
-            img.src = dataUrl;
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-            };
+        socketRef.current.on("connect", () => {
+            console.log("Connected to server, socket ID:", socketRef.current.id);
+            setUserId(socketRef.current.id);
         });
 
-        // Handle incoming draw events
-        socketRef.current.on("draw", (data) => {
-            const ctx = canvasRef.current.getContext("2d");
-            drawLine(ctx, data.x0, data.y0, data.x1, data.y1, data);
+        // Handle connection errors
+        socketRef.current.on("connect_error", (error) => {
+            console.error("Socket connection error:", error);
+        });
+
+        // Handle incoming draw events 
+        socketRef.current.on("drawStroke", (stroke) => {
+            if (stroke.userId !== socketRef.current.id) {
+                setHistory((prev) => [...prev, stroke]);
+                drawStroke(canvas.getContext("2d"), stroke);
+            }
         });
 
         // Handle canvas clear
         socketRef.current.on("clearCanvas", () => {
             const ctx = canvasRef.current.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            setHistory([canvas.toDataURL()]);
+            setHistory([]);
             setRedoHistory([]);
         });
 
-        // Handle canvas state update
-        socketRef.current.on("updateCanvasState", (dataUrl) => {
-            const img = new Image();
-            img.src = dataUrl;
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-            };
+        // Handle undo events
+        socketRef.current.on("undo", (data) => {
+            if (data.userId !== socketRef.current.id) {
+                setHistory((prev) => {
+                    const strokeIndex = prev.findIndex(
+                        (stroke) =>
+                            stroke.userId === data.userId &&
+                            stroke.segments[0]?.x0 === data.stroke.segments[0]?.x0 &&
+                            stroke.segments[0]?.y0 === data.stroke.segments[0]?.y0
+                    );
+                    if (strokeIndex !== -1) {
+                        const newHistory = [...prev];
+                        const [undoneStroke] = newHistory.splice(strokeIndex, 1);
+                        setRedoHistory((prevRedo) => [...prevRedo, undoneStroke]);
+                        redrawCanvas(newHistory);
+                        return newHistory;
+                    }
+                    return prev;
+                });
+            }
         });
-
-        // Save initial blank state
-        const initialState = canvas.toDataURL();
-        setHistory([initialState]);
 
         // Cleanup on unmount
         return () => {
@@ -100,73 +106,49 @@ export default function DrawingCanvas() {
         ctx.globalCompositeOperation = compositeOperation;
     }, [lineColour, lineWidth, opacity, compositeOperation]);
 
-    useEffect(() => {
-        const socket = socketRef.current;
-        socket.on('draw', (drawData) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext("2d");
-            drawLine(ctx, drawData.x0, drawData.y0, drawData.x1, drawData.y1, drawData);
-        });
-
-        socket.on('canvas-state', (canvasState) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
-            img.src = canvasState;
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-            };
-        });
-
-        return () => {
-            socket.off('draw');
-            socket.off('canvas-state');
-        };
-    }, []);
-
-    const saveState = () => {
+    const redrawCanvas = (strokes) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
-        // Force context update
-        ctx.stroke();
-        const dataUrl = canvas.toDataURL();
-        setHistory((prev) => {
-            // Skip duplicate states
-            if (prev.length > 0 && prev[prev.length - 1] === dataUrl) {
-                return prev;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes.forEach((stroke) => drawStroke(ctx, stroke));
+    };
+
+    const drawStroke = (ctx, stroke) => {
+        ctx.save();
+        ctx.strokeStyle = stroke.colour;
+        ctx.lineWidth = stroke.width;
+        ctx.globalAlpha = stroke.opacity;
+        ctx.globalCompositeOperation = stroke.compositeOperation;
+        ctx.beginPath();
+        stroke.segments.forEach((segment, index) => {
+            if (index === 0) {
+                ctx.moveTo(segment.x0, segment.y0);
             }
-            socketRef.current.emit("updateCanvasState", dataUrl); // Send state to server
-            return [...prev, dataUrl];
+            ctx.lineTo(segment.x1, segment.y1);
         });
-        setRedoHistory([]); // Clear redo history
+        ctx.stroke();
     };
 
     const undo = () => {
-        if (history.length <= 1) {
+        if (history.length === 0) {
             return;
         }
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        const lastState = history[history.length - 1];
-        const newHistory = history.slice(0, -1);
 
-        // Save current context settings
-        const savedCompositeOperation = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = "source-over"; // Reset for redraw
+        const lastStroke = history
+            .slice()
+            .reverse()
+            .find((stroke) => stroke.userId === userId);
+
+        if (!lastStroke) {
+            return;
+        }
+
+        const newHistory = history.filter((stroke) => stroke !== lastStroke);
         setHistory(newHistory);
-        setRedoHistory((prev) => [...prev, lastState]);
 
-        const img = new Image();
-        img.src = newHistory[newHistory.length - 1];
-        img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-            ctx.globalCompositeOperation = savedCompositeOperation; // Restore context
-        };
-        img.onerror = () => {
-            ctx.globalCompositeOperation = savedCompositeOperation; // Restore context on error
-        };
+        redrawCanvas(newHistory);
+
+        socketRef.current.emit("undo", { userId, stroke: lastStroke });
     };
 
     const redo = () => {
@@ -201,9 +183,9 @@ export default function DrawingCanvas() {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL();
-            setHistory([dataUrl]); // Reset history with cleared state
+            setHistory([]); // Reset history with cleared state
             setRedoHistory([]);
+            socketRef.current.emit("clearCanvas");
         }
         return;
     };
@@ -227,13 +209,16 @@ export default function DrawingCanvas() {
         link.download = 'Whiteboard.png';
         link.href = dataUrl;
         link.click();
-    }
+    };
 
     const startDrawing = ({ nativeEvent }) => {
         if (nativeEvent.button !== 0) return;
         const { offsetX, offsetY } = nativeEvent;
         setIsDrawing(true);
         setLastPos({ x: offsetX, y: offsetY });
+        const ctx = canvasRef.current.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY);
     };
 
     const stopDrawing = () => {
@@ -241,29 +226,39 @@ export default function DrawingCanvas() {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
             ctx.stroke();
-            saveState();
+            ctx.closePath();
+            if (currentStroke.length > 0) {
+                const stroke = {
+                    segments: currentStroke,
+                    colour: lineColour,
+                    width: lineWidth,
+                    opacity: opacity,
+                    compositeOperation: compositeOperation,
+                    userId: socketRef.current.id,
+                };
+                setHistory((prev) => [...prev, stroke]);
+                socketRef.current.emit("drawStroke", stroke);
+            }
         }
         setIsDrawing(false);
+        setCurrentStroke([]);
     };
 
     const draw = ({ nativeEvent }) => {
         if (!isDrawing || nativeEvent.button !== 0) return;
         const { offsetX, offsetY } = nativeEvent;
         const ctx = canvasRef.current.getContext("2d");
-        drawLine(ctx, lastPos.x, lastPos.y, offsetX, offsetY);
-        setLastPos({ x: offsetX, y: offsetY });
-    };
-
-    const drawLine = (ctx, x0, y0, x1, y1) => {
-        ctx.strokeStyle = lineColour;
-        ctx.lineWidth = lineWidth;
-        ctx.globalAlpha = opacity;
-        ctx.globalCompositeOperation = compositeOperation;
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
+        ctx.lineTo(offsetX, offsetY);
         ctx.stroke();
-        ctx.closePath();
+
+        const segment = {
+            x0: lastPos.x,
+            y0: lastPos.y,
+            x1: offsetX,
+            y1: offsetY,
+        };
+        setCurrentStroke((prev) => [...prev, segment]);
+        setLastPos({ x: offsetX, y: offsetY });
     };
 
     const eraser = () => {
@@ -285,24 +280,19 @@ export default function DrawingCanvas() {
             if (event.ctrlKey && event.key === "z") {
                 undo();
             }
-
             if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "z") {
                 redo();
             }
-
             if (event.ctrlKey && event.key === "Delete") {
                 clearCanvas();
             }
-
             if (event.ctrlKey && event.altKey && event.key === "s") {
                 download();
             }
-
             if (event.key.toLowerCase() === "d") {
                 drawing();
                 setActiveTool("draw");
             }
-
             if (event.key.toLowerCase() === "e") {
                 eraser();
                 setActiveTool("erase");
@@ -314,7 +304,7 @@ export default function DrawingCanvas() {
         return () => {
             window.removeEventListener('keydown', handleKeydown);
         };
-    }, [history, redoHistory]);
+    }, [history, redoHistory, userId]);
 
     return (
         <div>
@@ -326,7 +316,6 @@ export default function DrawingCanvas() {
                 download={download}
                 setShowToolbar={setShowToolbar}
             />
-
             {showToolbar && (
                 <Toolbar
                     activeTool={activeTool}
@@ -340,7 +329,6 @@ export default function DrawingCanvas() {
                     setOpacity={setOpacity}
                 />
             )}
-
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}

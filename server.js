@@ -12,20 +12,15 @@ const io = new Server(server, {
 });
 
 // Store the current canvas state
-let canvasState = null;
+let strokes = [];
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
-    // Send the current canvas state to other users
-    if (canvasState) {
-        socket.emit('initCanvas', canvasState);
-    }
-
     // Handle drawing actions
-    socket.on('draw', (data) => {
-        // Broadcast drawing action to all other clients
-        socket.broadcast.emit('draw', data);
+    socket.on("drawStroke", (stroke) => {
+        strokes.push(stroke);
+        socket.broadcast.emit("drawStroke", stroke);
     });
 
     // Handle canvas clear
@@ -38,6 +33,19 @@ io.on('connection', (socket) => {
     socket.on('updateCanvasState', (dataUrl) => {
         canvasState = dataUrl; // Update server canvas state
         socket.broadcast.emit('updateCanvasState', dataUrl);
+    });
+
+    // Handle undo event
+    socket.on("undo", (data) => {
+        strokes = strokes.filter(
+            (stroke) =>
+                !(
+                    stroke.userId === data.userId &&
+                    stroke.segments[0]?.x0 === data.stroke.segments[0]?.x0 &&
+                    stroke.segments[0]?.y0 === data.stroke.segments[0]?.y0
+                )
+        );
+        socket.broadcast.emit("undo", data);
     });
 
     socket.on('disconnect', () => {
