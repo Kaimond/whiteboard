@@ -145,9 +145,8 @@ export default function DrawingCanvas() {
 
         const newHistory = history.filter((stroke) => stroke !== lastStroke);
         setHistory(newHistory);
-
+        setRedoHistory((prevRedo) => [...prevRedo, lastStroke]);
         redrawCanvas(newHistory);
-
         socketRef.current.emit("undo", { userId, stroke: lastStroke });
     };
 
@@ -155,27 +154,24 @@ export default function DrawingCanvas() {
         if (redoHistory.length === 0) {
             return;
         }
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        const lastRedoState = redoHistory[redoHistory.length - 1];
-        const newRedoHistory = redoHistory.slice(0, -1);
 
-        // Save current context settings
-        const savedCompositeOperation = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = "source-over";
+        const lastStroke = redoHistory
+            .slice()
+            .reverse()
+            .find((stroke) => stroke.userId === userId);
+
+        if (!lastStroke) {
+            return;
+        }
+
+        const newRedoHistory = redoHistory.filter((stroke) => stroke !== lastStroke);
         setRedoHistory(newRedoHistory);
-        setHistory((prev) => [...prev, lastRedoState]);
-
-        const img = new Image();
-        img.src = lastRedoState;
-        img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-            ctx.globalCompositeOperation = savedCompositeOperation;
-        };
-        img.onerror = () => {
-            ctx.globalCompositeOperation = savedCompositeOperation;
-        };
+        setHistory((prevHistory => {
+            const newHistory = [...prevHistory, lastStroke];
+            redrawCanvas(newHistory);
+            socketRef.current.emit("drawStroke", lastStroke);
+            return newHistory;
+        }))
     };
 
     const clearCanvas = () => {
