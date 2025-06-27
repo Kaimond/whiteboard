@@ -164,6 +164,7 @@ export default function DrawingCanvas() {
             ctx.lineTo(segment.x1, segment.y1);
         });
         ctx.stroke();
+        ctx.restore();
     };
 
     const undo = () => {
