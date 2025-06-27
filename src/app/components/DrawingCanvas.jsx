@@ -46,11 +46,19 @@ export default function DrawingCanvas() {
         socketRef.current.on("connect", () => {
             console.log("Connected to server, socket ID:", socketRef.current.id);
             setUserId(socketRef.current.id);
+            socketRef.current.emit("loadCanvas");
         });
 
         // Handle connection errors
         socketRef.current.on("connect_error", (error) => {
             console.error("Socket connection error:", error);
+        });
+
+        // Handles canvas state update from server on connect or refresh
+        socketRef.current.on("canvasState", (state) => {
+            setHistory([]);
+            setRedoHistory([]);
+            redrawCanvas(state.history);
         });
 
         // Handle incoming draw events 
