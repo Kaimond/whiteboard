@@ -11,24 +11,19 @@ const io = new Server(server, {
     },
 });
 
-// Store the current canvas state
-let strokes = [];
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     // Handle drawing actions
     socket.on("drawStroke", (stroke) => {
-        strokes.push(stroke);
         socket.broadcast.emit("drawStroke", stroke);
     });
 
     // Handle canvas clear
     socket.on('clearCanvas', () => {
-        canvasState = null; // Reset canvas state
         socket.broadcast.emit('clearCanvas');
     });
-
     // Handle canvas state update
     socket.on('updateCanvasState', (dataUrl) => {
         canvasState = dataUrl; // Update server canvas state
@@ -37,15 +32,12 @@ io.on('connection', (socket) => {
 
     // Handle undo event
     socket.on("undo", (data) => {
-        strokes = strokes.filter(
-            (stroke) =>
-                !(
-                    stroke.userId === data.userId &&
-                    stroke.segments[0]?.x0 === data.stroke.segments[0]?.x0 &&
-                    stroke.segments[0]?.y0 === data.stroke.segments[0]?.y0
-                )
-        );
         socket.broadcast.emit("undo", data);
+    });
+
+    // Handle redo event
+    socket.on('redo', (data) => {
+        socket.broadcast.emit("redo", data);
     });
 
     socket.on('disconnect', () => {

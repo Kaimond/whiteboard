@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Toolbar from "./Toolbar";
 import TopToolbar from "./TopToolbar";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function DrawingCanvas() {
     const canvasRef = useRef(null);
@@ -55,7 +56,13 @@ export default function DrawingCanvas() {
         // Handle incoming draw events 
         socketRef.current.on("drawStroke", (stroke) => {
             if (stroke.userId !== socketRef.current.id) {
-                setHistory((prev) => [...prev, stroke]);
+                setHistory((prev) => {
+                    // Avoid duplicates in history
+                    if (prev.some((s) => s.id === stroke.id)) {
+                        return prev;
+                    }
+                    return [...prev, stroke];
+                });
                 drawStroke(canvas.getContext("2d"), stroke);
             }
         });
@@ -73,19 +80,49 @@ export default function DrawingCanvas() {
             if (data.userId !== socketRef.current.id) {
                 setHistory((prev) => {
                     const strokeIndex = prev.findIndex(
-                        (stroke) =>
-                            stroke.userId === data.userId &&
-                            stroke.segments[0]?.x0 === data.stroke.segments[0]?.x0 &&
-                            stroke.segments[0]?.y0 === data.stroke.segments[0]?.y0
+                        (stroke) => stroke.userId === data.userId && stroke.id === data.stroke.id
                     );
                     if (strokeIndex !== -1) {
                         const newHistory = [...prev];
                         const [undoneStroke] = newHistory.splice(strokeIndex, 1);
-                        setRedoHistory((prevRedo) => [...prevRedo, undoneStroke]);
+                        setRedoHistory((prevRedo) => {
+                            // Avoid duplicates in redoHistory
+                            if (prevRedo.some((s) => s.id === undoneStroke.id)) {
+                                return prevRedo;
+                            }
+                            const newRedo = [...prevRedo, undoneStroke];
+                            return newRedo;
+                        });
                         redrawCanvas(newHistory);
                         return newHistory;
                     }
                     return prev;
+                });
+            }
+        });
+
+        // Handle redo events
+        socketRef.current.on("redo", (data) => {
+            if (data.userId !== socketRef.current.id) {
+                setRedoHistory((prevRedo) => {
+                    const strokeIndex = prevRedo.findIndex(
+                        (stroke) => stroke.userId === data.userId && stroke.id === data.stroke.id
+                    );
+                    if (strokeIndex !== -1) {
+                        const newRedoHistory = [...prevRedo];
+                        const [redoneStroke] = newRedoHistory.splice(strokeIndex, 1);
+                        setHistory((prevHistory) => {
+                            // Avoid duplicates in history
+                            if (prevHistory.some((s) => s.id === redoneStroke.id)) {
+                                return prevHistory;
+                            }
+                            const newHistory = [...prevHistory, redoneStroke];
+                            redrawCanvas(newHistory);
+                            return newHistory;
+                        });
+                        return newRedoHistory;
+                    }
+                    return prevRedo;
                 });
             }
         });
@@ -166,12 +203,15 @@ export default function DrawingCanvas() {
 
         const newRedoHistory = redoHistory.filter((stroke) => stroke !== lastStroke);
         setRedoHistory(newRedoHistory);
-        setHistory((prevHistory => {
+        setHistory((prevHistory) => {
+            if (prevHistory.some((s) => s.id === lastStroke.id)) {
+                return prevHistory;
+            }
             const newHistory = [...prevHistory, lastStroke];
             redrawCanvas(newHistory);
-            socketRef.current.emit("drawStroke", lastStroke);
+            socketRef.current.emit("redo", { userId, stroke: lastStroke });
             return newHistory;
-        }))
+        });
     };
 
     const clearCanvas = () => {
@@ -215,6 +255,7 @@ export default function DrawingCanvas() {
         const ctx = canvasRef.current.getContext("2d");
         ctx.beginPath();
         ctx.moveTo(offsetX, offsetY);
+        setCurrentStroke([{ id: uuidv4() }]);
     };
 
     const stopDrawing = () => {
@@ -223,8 +264,9 @@ export default function DrawingCanvas() {
             const ctx = canvas.getContext("2d");
             ctx.stroke();
             ctx.closePath();
-            if (currentStroke.length > 0) {
+            if (currentStroke.length > 1) {
                 const stroke = {
+                    id: currentStroke[0].id,
                     segments: currentStroke,
                     colour: lineColour,
                     width: lineWidth,
@@ -232,7 +274,12 @@ export default function DrawingCanvas() {
                     compositeOperation: compositeOperation,
                     userId: socketRef.current.id,
                 };
-                setHistory((prev) => [...prev, stroke]);
+                setHistory((prev) => {
+                    if (prev.some((s) => s.id === stroke.id)) {
+                        return prev;
+                    }
+                    return [...prev, stroke];
+                });
                 socketRef.current.emit("drawStroke", stroke);
             }
         }
