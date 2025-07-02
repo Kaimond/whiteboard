@@ -41,7 +41,10 @@ export default function DrawingCanvas() {
         ctx.globalCompositeOperation = compositeOperation;
 
         // Connect to WebSocket server
-        socketRef.current = io("http://localhost:3001");
+        socketRef.current = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL, {
+          reconnection: true,
+          secure: true
+        });
 
         socketRef.current.on("connect", () => {
             console.log("Connected to server, socket ID:", socketRef.current.id);
