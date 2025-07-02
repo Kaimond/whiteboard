@@ -8,6 +8,7 @@ const io = new Server(server, {
     cors: {
         origin: ["http://localhost:3000", "https://whiteboard-seven-jade.vercel.app"]
         methods: ['GET', 'POST'],
+        allowedHeaders: ["Content-Type"],
     },
 });
 
@@ -55,6 +56,7 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3001, () => {
-    console.log('Server running on http://localhost:3001');
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`WebSocket server running on port ${PORT}`);
 });
